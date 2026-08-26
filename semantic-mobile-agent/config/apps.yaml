@@ -1,0 +1,207 @@
+# Stable seed aliases. At runtime the Android bridge adds every installed launcher app,
+# so this file is an accelerator rather than a hard capability ceiling.
+apps:
+  - name: 美团
+    package: com.sankuai.meituan
+    aliases: [美团App, Meituan]
+    tags: [local-life, food, ride]
+  - name: 大众点评
+    package: com.dianping.v1
+    aliases: [点评, Dianping]
+    tags: [local-life, food]
+  - name: 饿了么
+    package: me.ele
+    aliases: [饿了吗, Eleme]
+    tags: [food]
+  - name: 滴滴出行
+    package: com.sdu.didi.psnger
+    aliases: [滴滴, Didi]
+    tags: [ride]
+  - name: 高德地图
+    package: com.autonavi.minimap
+    aliases: [高德, AMap]
+    tags: [map, navigation, ride]
+  - name: 百度地图
+    package: com.baidu.BaiduMap
+    aliases: [百度导航, Baidu Maps]
+    tags: [map, navigation, ride]
+  - name: 微信
+    package: com.tencent.mm
+    aliases: [WeChat, weixin]
+    tags: [message, payment]
+  - name: QQ
+    package: com.tencent.mobileqq
+    aliases: [手机QQ]
+    tags: [message]
+  - name: 支付宝
+    package: com.eg.android.AlipayGphone
+    aliases: [Alipay]
+    tags: [payment, local-life]
+  - name: 淘宝
+    package: com.taobao.taobao
+    aliases: [手机淘宝, Taobao]
+    tags: [shopping]
+  - name: 天猫
+    package: com.tmall.wireless
+    aliases: [Tmall]
+    tags: [shopping]
+  - name: 京东
+    package: com.jingdong.app.mall
+    aliases: [JD, 京东商城]
+    tags: [shopping]
+  - name: 拼多多
+    package: com.xunmeng.pinduoduo
+    aliases: [PDD]
+    tags: [shopping]
+  - name: 闲鱼
+    package: com.taobao.idlefish
+    aliases: [咸鱼, Xianyu]
+    tags: [shopping]
+  - name: 抖音
+    package: com.ss.android.ugc.aweme
+    aliases: [Douyin]
+    tags: [video, social]
+  - name: 快手
+    package: com.smile.gifmaker
+    aliases: [Kuaishou]
+    tags: [video, social]
+  - name: 小红书
+    package: com.xingin.xhs
+    aliases: [RED, Xiaohongshu]
+    tags: [social, shopping]
+  - name: 哔哩哔哩
+    package: tv.danmaku.bili
+    aliases: [B站, bilibili]
+    tags: [video]
+  - name: 微博
+    package: com.sina.weibo
+    aliases: [新浪微博, Weibo]
+    tags: [social]
+  - name: 知乎
+    package: com.zhihu.android
+    aliases: [Zhihu]
+    tags: [content]
+  - name: 今日头条
+    package: com.ss.android.article.news
+    aliases: [头条, Toutiao]
+    tags: [news]
+  - name: 百度
+    package: com.baidu.searchbox
+    aliases: [百度App, Baidu]
+    tags: [search]
+  - name: 携程旅行
+    package: ctrip.android.view
+    aliases: [携程, Ctrip, Trip.com]
+    tags: [travel]
+  - name: 去哪儿旅行
+    package: com.Qunar
+    aliases: [去哪儿, Qunar]
+    tags: [travel]
+  - name: 飞猪旅行
+    package: com.taobao.trip
+    aliases: [飞猪, Fliggy]
+    tags: [travel]
+  - name: 铁路12306
+    package: com.MobileTicket
+    aliases: [12306]
+    tags: [travel]
+  - name: 飞常准
+    package: vz.com
+    aliases: [VariFlight]
+    tags: [travel]
+  - name: 飞书
+    package: com.ss.android.lark
+    aliases: [Feishu, Lark]
+    tags: [work, message]
+  - name: 钉钉
+    package: com.alibaba.android.rimet
+    aliases: [DingTalk]
+    tags: [work, message]
+  - name: 企业微信
+    package: com.tencent.wework
+    aliases: [企微, WeCom]
+    tags: [work, message]
+  - name: 腾讯会议
+    package: com.tencent.wemeet.app
+    aliases: [Tencent Meeting]
+    tags: [work, meeting]
+  - name: WPS Office
+    package: cn.wps.moffice_eng
+    aliases: [WPS, 金山文档]
+    tags: [work, document]
+  - name: 网易云音乐
+    package: com.netease.cloudmusic
+    aliases: [网易云, CloudMusic]
+    tags: [music]
+  - name: QQ音乐
+    package: com.tencent.qqmusic
+    aliases: [QQ Music]
+    tags: [music]
+  - name: 喜马拉雅
+    package: com.ximalaya.ting.android
+    aliases: [Ximalaya]
+    tags: [audio]
+  - name: Keep
+    package: com.gotokeep.keep
+    aliases: [开普]
+    tags: [fitness]
+  - name: Chrome
+    package: com.android.chrome
+    aliases: [谷歌浏览器, Google Chrome]
+    tags: [browser]
+  - name: Gmail
+    package: com.google.android.gm
+    aliases: [谷歌邮箱]
+    tags: [mail]
+  - name: Outlook
+    package: com.microsoft.office.outlook
+    aliases: [微软邮箱]
+    tags: [mail]
+  - name: Google Maps
+    package: com.google.android.apps.maps
+    aliases: [谷歌地图]
+    tags: [map, navigation]
+  - name: YouTube
+    package: com.google.android.youtube
+    aliases: [油管]
+    tags: [video]
+  - name: Spotify
+    package: com.spotify.music
+    aliases: [声田]
+    tags: [music]
+  - name: WhatsApp
+    package: com.whatsapp
+    aliases: [WA]
+    tags: [message]
+  - name: Telegram
+    package: org.telegram.messenger
+    aliases: [TG, 电报]
+    tags: [message]
+  - name: Instagram
+    package: com.instagram.android
+    aliases: [IG]
+    tags: [social]
+  - name: Uber
+    package: com.ubercab
+    aliases: [优步]
+    tags: [ride]
+  - name: Lyft
+    package: me.lyft.android
+    aliases: []
+    tags: [ride]
+  - name: Grab
+    package: com.grabtaxi.passenger
+    aliases: [Grab打车]
+    tags: [ride]
+  - name: DoorDash
+    package: com.dd.doordash
+    aliases: []
+    tags: [food]
+  - name: Airbnb
+    package: com.airbnb.android
+    aliases: [爱彼迎]
+    tags: [travel]
+  - name: Booking.com
+    package: com.booking
+    aliases: [缤客, Booking]
+    tags: [travel]
