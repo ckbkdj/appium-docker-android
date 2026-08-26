@@ -1,0 +1,16 @@
+# These are commitment actions, not mere navigation or text entry.
+critical_patterns:
+  - "支付|付款|确认支付|立即支付|pay now|confirm payment"
+  - "提交订单|确认订单|立即购买|确认购买|place order|buy now"
+  - "立即叫车|确认叫车|确认呼叫|呼叫.*车|book ride|request ride"
+  - "转账|汇款|提现|transfer|withdraw"
+  - "开户|借款|贷款|申购|赎回|买入|卖出"
+
+high_risk_patterns:
+  - "发送|send"
+  - "删除|清空|注销|delete|remove account"
+  - "发布|提交评论|post|publish"
+  - "授权|同意协议|grant|authorize"
+  - "拨打|call"
+  - "确认预约|确认预订|book now|reserve"
+  - "修改密码|绑定手机|change password"
