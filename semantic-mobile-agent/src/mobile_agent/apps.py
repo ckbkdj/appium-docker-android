@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from .models import InstalledApp
 
@@ -16,6 +16,15 @@ class AppProfile(BaseModel):
     package_candidates: list[str] = Field(default_factory=list)
     capabilities: list[str] = Field(default_factory=list)
     entry_texts: dict[str, list[str]] = Field(default_factory=dict)
+
+    @field_validator("aliases", mode="before")
+    @classmethod
+    def normalize_aliases(cls, value: Any) -> list[str]:
+        if value is None:
+            return []
+        if not isinstance(value, list):
+            raise ValueError("aliases must be a list")
+        return [str(item) for item in value]
 
     @property
     def all_names(self) -> list[str]:
