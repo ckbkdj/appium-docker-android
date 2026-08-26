@@ -1,0 +1,151 @@
+# Static entries are hints, not a closed allow-list. Runtime launcher discovery
+# merges every installed app so the generic layer scales beyond this seed pack.
+apps:
+  - name: 美团
+    aliases: [美团外卖, meituan]
+    package_candidates: [com.sankuai.meituan]
+    capabilities: [open, search, food, ride]
+    entry_texts:
+      ride: [打车, 打车/租车, 美团打车, 出行]
+      food: [外卖, 美食]
+  - name: 大众点评
+    aliases: [点评, dianping]
+    package_candidates: [com.dianping.v1]
+    capabilities: [open, search, food]
+  - name: 滴滴出行
+    aliases: [滴滴, didi]
+    package_candidates: [com.sdu.didi.psnger]
+    capabilities: [open, ride]
+    entry_texts:
+      ride: [打车, 出发]
+  - name: 高德地图
+    aliases: [高德, amap]
+    package_candidates: [com.autonavi.minimap]
+    capabilities: [open, search, navigation, ride]
+    entry_texts:
+      ride: [打车, 打车出行]
+      navigation: [路线, 导航]
+  - name: 百度地图
+    aliases: [baidumap]
+    package_candidates: [com.baidu.BaiduMap]
+    capabilities: [open, search, navigation, ride]
+  - name: 微信
+    aliases: [wechat, wx]
+    package_candidates: [com.tencent.mm]
+    capabilities: [open, search, message, mini_program]
+  - name: QQ
+    aliases: [腾讯QQ]
+    package_candidates: [com.tencent.mobileqq]
+    capabilities: [open, search, message]
+  - name: 支付宝
+    aliases: [alipay]
+    package_candidates: [com.eg.android.AlipayGphone]
+    capabilities: [open, search, mini_program, payment]
+  - name: 淘宝
+    aliases: [手机淘宝, taobao]
+    package_candidates: [com.taobao.taobao]
+    capabilities: [open, search, shopping]
+  - name: 京东
+    aliases: [京东商城, jd]
+    package_candidates: [com.jingdong.app.mall]
+    capabilities: [open, search, shopping]
+  - name: 拼多多
+    aliases: [pdd]
+    package_candidates: [com.xunmeng.pinduoduo]
+    capabilities: [open, search, shopping]
+  - name: 饿了么
+    aliases: [饿了么外卖, eleme]
+    package_candidates: [me.ele]
+    capabilities: [open, search, food]
+  - name: 抖音
+    aliases: [douyin]
+    package_candidates: [com.ss.android.ugc.aweme]
+    capabilities: [open, search, media]
+  - name: 快手
+    aliases: [kuaishou]
+    package_candidates: [com.smile.gifmaker]
+    capabilities: [open, search, media]
+  - name: 小红书
+    aliases: [红书, xhs]
+    package_candidates: [com.xingin.xhs]
+    capabilities: [open, search, media]
+  - name: 微博
+    aliases: [新浪微博, weibo]
+    package_candidates: [com.sina.weibo]
+    capabilities: [open, search, media]
+  - name: 哔哩哔哩
+    aliases: [B站, bilibili]
+    package_candidates: [tv.danmaku.bili]
+    capabilities: [open, search, media]
+  - name: 铁路12306
+    aliases: [12306]
+    package_candidates: [com.MobileTicket]
+    capabilities: [open, search, travel, booking]
+  - name: 携程旅行
+    aliases: [携程, ctrip]
+    package_candidates: [ctrip.android.view]
+    capabilities: [open, search, travel, booking]
+  - name: 飞猪旅行
+    aliases: [飞猪, fliggy]
+    package_candidates: [com.taobao.trip]
+    capabilities: [open, search, travel, booking]
+  - name: 去哪儿旅行
+    aliases: [去哪儿, qunar]
+    package_candidates: [com.Qunar]
+    capabilities: [open, search, travel, booking]
+  - name: 同程旅行
+    aliases: [同程]
+    package_candidates: [com.tongcheng.android]
+    capabilities: [open, search, travel, booking]
+  - name: 网易云音乐
+    aliases: [网易云, cloudmusic]
+    package_candidates: [com.netease.cloudmusic]
+    capabilities: [open, search, media]
+  - name: QQ音乐
+    aliases: [qqmusic]
+    package_candidates: [com.tencent.qqmusic]
+    capabilities: [open, search, media]
+  - name: 腾讯视频
+    aliases: [qqlive]
+    package_candidates: [com.tencent.qqlive]
+    capabilities: [open, search, media]
+  - name: 爱奇艺
+    aliases: [iqiyi]
+    package_candidates: [com.qiyi.video]
+    capabilities: [open, search, media]
+  - name: 优酷视频
+    aliases: [优酷, youku]
+    package_candidates: [com.youku.phone]
+    capabilities: [open, search, media]
+  - name: WPS Office
+    aliases: [WPS, wps]
+    package_candidates: [cn.wps.moffice_eng, cn.wps.moffice]
+    capabilities: [open, search, document]
+  - name: 钉钉
+    aliases: [dingding, dingtalk]
+    package_candidates: [com.alibaba.android.rimet]
+    capabilities: [open, search, message, work]
+  - name: 飞书
+    aliases: [feishu, lark]
+    package_candidates: [com.ss.android.lark]
+    capabilities: [open, search, message, work]
+  - name: 企业微信
+    aliases: [企微, wecom]
+    package_candidates: [com.tencent.wework]
+    capabilities: [open, search, message, work]
+  - name: 知乎
+    aliases: [zhihu]
+    package_candidates: [com.zhihu.android]
+    capabilities: [open, search, media]
+  - name: 今日头条
+    aliases: [头条, toutiao]
+    package_candidates: [com.ss.android.article.news]
+    capabilities: [open, search, media]
+  - name: 百度
+    aliases: [百度搜索, baidu]
+    package_candidates: [com.baidu.searchbox]
+    capabilities: [open, search]
+  - name: Chrome
+    aliases: [谷歌浏览器, chrome]
+    package_candidates: [com.android.chrome]
+    capabilities: [open, search, browser]
