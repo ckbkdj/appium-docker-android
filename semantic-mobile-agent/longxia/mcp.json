@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "semantic-mobile-agent": {
+      "command": "mobile-agent-mcp",
+      "args": [],
+      "env": {
+        "MOBILE_AGENT_API_URL": "http://127.0.0.1:8080",
+        "MOBILE_AGENT_API_TOKEN": "${MOBILE_AGENT_API_TOKEN}"
+      }
+    }
+  }
+}
