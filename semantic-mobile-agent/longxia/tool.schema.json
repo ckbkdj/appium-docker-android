@@ -1,0 +1,100 @@
+{
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "mobile_agent_plan",
+        "description": "将自然语言编译为安全的 Android 操作计划，但不执行。",
+        "parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["instruction", "device"],
+          "properties": {
+            "instruction": {"type": "string", "minLength": 1},
+            "device": {"$ref": "#/$defs/device"},
+            "context": {"type": "object", "additionalProperties": true},
+            "max_steps": {"type": "integer", "minimum": 1, "maximum": 60, "default": 30}
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mobile_agent_execute",
+        "description": "在宿主指定的 Android 设备上启动语义任务。不可逆动作会暂停等待确认。",
+        "parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["instruction", "device"],
+          "properties": {
+            "instruction": {"type": "string", "minLength": 1},
+            "device": {"$ref": "#/$defs/device"},
+            "context": {"type": "object", "additionalProperties": true},
+            "idempotency_key": {"type": ["string", "null"], "maxLength": 200},
+            "dry_run": {"type": "boolean", "default": false},
+            "max_steps": {"type": "integer", "minimum": 1, "maximum": 60, "default": 30}
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mobile_agent_status",
+        "description": "查询任务状态、步骤结果和当前待确认动作。",
+        "parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["task_id"],
+          "properties": {"task_id": {"type": "string", "minLength": 1}}
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mobile_agent_confirm",
+        "description": "批准或拒绝服务端当前返回的待确认不可逆动作。",
+        "parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["task_id", "approved"],
+          "properties": {
+            "task_id": {"type": "string", "minLength": 1},
+            "approved": {"type": "boolean"},
+            "note": {"type": ["string", "null"], "maxLength": 1000}
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "mobile_agent_cancel",
+        "description": "取消排队、执行中或等待确认的任务。",
+        "parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["task_id"],
+          "properties": {"task_id": {"type": "string", "minLength": 1}}
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "device": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["serial"],
+      "properties": {
+        "serial": {"type": "string", "minLength": 1},
+        "appium_url": {"type": ["string", "null"]},
+        "bridge_port": {"type": ["integer", "null"], "minimum": 1024, "maximum": 65535},
+        "bridge_token": {"type": ["string", "null"]},
+        "platform_version": {"type": ["string", "null"]},
+        "metadata": {"type": "object", "additionalProperties": true}
+      }
+    }
+  }
+}
