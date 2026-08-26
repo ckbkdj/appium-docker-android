@@ -1,0 +1,50 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "semantic-mobile-agent"
+version = "0.1.0"
+description = "Low-latency semantic Android control sub-agent using a local policy, ADB, Appium and an optional Accessibility bridge."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [{ name = "ckbkdj" }]
+dependencies = [
+  "fastapi>=0.115,<1",
+  "uvicorn[standard]>=0.30,<1",
+  "pydantic>=2.8,<3",
+  "pydantic-settings>=2.4,<3",
+  "PyYAML>=6.0,<7",
+  "httpx>=0.27,<1",
+  "openai>=1.50,<3",
+  "appium-python-client>=4.0,<6",
+  "mcp>=1.2,<3",
+]
+
+[project.optional-dependencies]
+onnx = ["onnxruntime>=1.19,<2", "numpy>=1.26,<3"]
+dev = [
+  "pytest>=8.2,<9",
+  "pytest-asyncio>=0.24,<1",
+  "ruff>=0.8,<1",
+]
+
+[project.scripts]
+semantic-mobile-agent = "semantic_mobile_agent.api:main"
+semantic-mobile-mcp = "semantic_mobile_agent.mcp_server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/semantic_mobile_agent"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "ASYNC"]
+ignore = ["E501"]
