@@ -1,0 +1,14 @@
+services:
+  semantic-mobile-agent:
+    build: .
+    container_name: semantic-mobile-agent
+    restart: unless-stopped
+    network_mode: host
+    env_file:
+      - .env
+    environment:
+      # With host networking this reaches the host ADB server without exposing USB into the container.
+      ADB_SERVER_SOCKET: tcp:127.0.0.1:5037
+    volumes:
+      - ./data:/app/data
+      - ${HOME}/.android:/home/agent/.android:ro
