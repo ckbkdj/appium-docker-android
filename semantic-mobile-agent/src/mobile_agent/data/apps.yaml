@@ -78,7 +78,7 @@ apps:
     package_candidates: [tv.danmaku.bili]
     capabilities: [open, search, media]
   - name: 铁路12306
-    aliases: [12306]
+    aliases: ["12306"]
     package_candidates: [com.MobileTicket]
     capabilities: [open, search, travel, booking]
   - name: 携程旅行
