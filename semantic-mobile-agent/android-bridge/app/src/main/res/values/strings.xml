@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Semantic Mobile Bridge</string>
+    <string name="service_name">Semantic Mobile Agent Bridge</string>
+    <string name="service_description">Local-only semantic phone control bridge exposed through ADB forwarding.</string>
+</resources>
