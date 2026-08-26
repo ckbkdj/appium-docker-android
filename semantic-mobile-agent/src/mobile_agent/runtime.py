@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import time
 from collections.abc import Callable
+from functools import partial
 from typing import Any
 
 from .apps import AppRegistry
@@ -10,9 +11,11 @@ from .cache import WorkflowCache
 from .device import ActionExecutor, DryRunExecutor
 from .models import (
     Action,
+    ActionKind,
     ActionResult,
     ConfirmationRequest,
     Plan,
+    RiskLevel,
     TaskRecord,
     TaskRequest,
     TaskStatus,
@@ -128,7 +131,9 @@ class TaskRunner:
             return stored
         job = asyncio.create_task(self._run(record.task_id), name=f"mobile-task-{record.task_id}")
         self._jobs[record.task_id] = job
-        job.add_done_callback(lambda _job, task_id=record.task_id: self._jobs.pop(task_id, None))
+        job.add_done_callback(
+            lambda _job, task_id=record.task_id: self._jobs.pop(task_id, None)
+        )
         return record
 
     async def confirm(self, task_id: str, request: ConfirmationRequest) -> TaskRecord:
@@ -177,7 +182,7 @@ class TaskRunner:
         started = time.perf_counter()
         initial_state = self._provided_state(task.request)
         try:
-            await self.store.mutate(task_id, lambda record: setattr(record, "status", TaskStatus.PLANNING))
+            await self.store.mutate(task_id, self._mark_planning)
             if initial_state is None and not task.request.dry_run:
                 initial_state = await self._safe_state(task.request)
 
@@ -190,12 +195,7 @@ class TaskRunner:
                 plan = await self.planner.plan(task.request)
             plan = self._bounded_plan(plan, task.request.max_steps)
 
-            def start_running(record: TaskRecord) -> None:
-                record.plan = plan
-                record.status = TaskStatus.RUNNING
-                record.current_step = 0
-
-            await self.store.mutate(task_id, start_running)
+            await self.store.mutate(task_id, partial(self._start_running, plan=plan))
             succeeded = await self._execute_plan(task_id, initial_state)
             task = await self.store.get(task_id)
             if not succeeded or task.status is TaskStatus.CANCELLED:
@@ -215,6 +215,7 @@ class TaskRunner:
                 await self.store.mutate(task_id, self._mark_cancelled)
             raise
         except Exception as exc:
+            error_message = str(exc)
             task = await self.store.get(task_id)
             if task.plan is not None:
                 await self.cache.record_failure(
@@ -223,7 +224,10 @@ class TaskRunner:
                     initial_state,
                     task.plan,
                 )
-            await self.store.mutate(task_id, lambda record: self._mark_failed(record, str(exc)))
+            await self.store.mutate(
+                task_id,
+                partial(self._mark_failed, message=error_message),
+            )
         finally:
             self._confirm_events.pop(task_id, None)
             self._confirm_decisions.pop(task_id, None)
@@ -240,6 +244,37 @@ class TaskRunner:
                 if task.status is TaskStatus.CANCELLED:
                     return False
                 action = plan.steps[task.current_step]
+
+                if action.kind is ActionKind.ASK_USER:
+                    handoff = action.model_copy(
+                        update={
+                            "requires_confirmation": True,
+                            "risk": RiskLevel.HIGH,
+                        }
+                    )
+                    approved = await self._await_confirmation(
+                        task_id,
+                        handoff,
+                        action.description or "需要用户在手机上手动处理后继续",
+                    )
+                    if not approved:
+                        await self.store.mutate(task_id, self._mark_cancelled_by_user)
+                        return False
+                    result = ActionResult(
+                        action_id=action.id,
+                        ok=True,
+                        latency_ms=0,
+                        backend="user-handoff",
+                        message="user completed manual handoff",
+                    )
+                    await self.store.mutate(
+                        task_id,
+                        partial(self._append_result, result=result),
+                    )
+                    await self.store.mutate(task_id, self._advance_step)
+                    task = await self.store.get(task_id)
+                    continue
+
                 decision = self.risk_policy.evaluate(action)
                 action = action.model_copy(
                     update={
@@ -254,14 +289,16 @@ class TaskRunner:
                         await self.store.mutate(task_id, self._mark_cancelled_by_user)
                         return False
 
-                executor: ActionExecutor = DryRunExecutor() if task.request.dry_run else self.executor
+                executor: ActionExecutor = (
+                    DryRunExecutor() if task.request.dry_run else self.executor
+                )
                 result = await self._execute_with_retries(executor, action, task.request)
-                await self.store.mutate(task_id, lambda record: record.results.append(result))
+                await self.store.mutate(
+                    task_id,
+                    partial(self._append_result, result=result),
+                )
                 if result.ok:
-                    await self.store.mutate(
-                        task_id,
-                        lambda record: setattr(record, "current_step", record.current_step + 1),
-                    )
+                    await self.store.mutate(task_id, self._advance_step)
                     task = await self.store.get(task_id)
                     continue
 
@@ -272,7 +309,8 @@ class TaskRunner:
                 snapshot = await self._safe_snapshot(task.request)
                 if snapshot is None:
                     raise RuntimeError(
-                        f"Action failed and UI could not be captured: {action.description}: {result.message}"
+                        "Action failed and UI could not be captured: "
+                        f"{action.description}: {result.message}"
                     )
                 replacement = await self.planner.replan(
                     task.request,
@@ -283,19 +321,15 @@ class TaskRunner:
                 )
                 if replacement is None:
                     raise RuntimeError(
-                        f"Action failed and no replanner is available: {action.description}: {result.message}"
+                        "Action failed and no replanner is available: "
+                        f"{action.description}: {result.message}"
                     )
                 replans += 1
                 replacement = self._bounded_plan(replacement, task.request.max_steps)
-
-                def install_replan(record: TaskRecord) -> None:
-                    record.plan = replacement
-                    record.current_step = 0
-                    record.status = TaskStatus.RUNNING
-                    record.pending_action = None
-                    record.confirmation_reason = None
-
-                await self.store.mutate(task_id, install_replan)
+                await self.store.mutate(
+                    task_id,
+                    partial(self._install_replan, plan=replacement),
+                )
                 break
             else:
                 return True
@@ -306,13 +340,35 @@ class TaskRunner:
         action: Action,
         request: TaskRequest,
     ) -> ActionResult:
+        retry_safe = action.metadata.get("retry_safe") is True
+        max_attempts = action.retries + 1
+        if not retry_safe and (
+            action.requires_confirmation
+            or action.risk in {RiskLevel.HIGH, RiskLevel.CRITICAL}
+        ):
+            max_attempts = 1
+
         last: ActionResult | None = None
-        for attempt in range(action.retries + 1):
-            last = await executor.execute(action, request.device)
+        for attempt in range(max_attempts):
+            started = time.perf_counter()
+            try:
+                last = await asyncio.wait_for(
+                    executor.execute(action, request.device),
+                    timeout=max(0.1, action.timeout_ms / 1000),
+                )
+            except TimeoutError:
+                last = ActionResult(
+                    action_id=action.id,
+                    ok=False,
+                    latency_ms=(time.perf_counter() - started) * 1000,
+                    backend="timeout",
+                    message=f"action timed out after {action.timeout_ms} ms",
+                )
             last.details["attempt"] = attempt + 1
+            last.details["max_attempts"] = max_attempts
             if last.ok:
                 return last
-            if attempt < action.retries:
+            if attempt + 1 < max_attempts:
                 await asyncio.sleep(min(0.15 * (attempt + 1), 0.5))
         assert last is not None
         return last
@@ -375,6 +431,32 @@ class TaskRunner:
                 ],
             }
         )
+
+    @staticmethod
+    def _mark_planning(record: TaskRecord) -> None:
+        record.status = TaskStatus.PLANNING
+
+    @staticmethod
+    def _start_running(record: TaskRecord, *, plan: Plan) -> None:
+        record.plan = plan
+        record.status = TaskStatus.RUNNING
+        record.current_step = 0
+
+    @staticmethod
+    def _append_result(record: TaskRecord, *, result: ActionResult) -> None:
+        record.results.append(result)
+
+    @staticmethod
+    def _advance_step(record: TaskRecord) -> None:
+        record.current_step += 1
+
+    @staticmethod
+    def _install_replan(record: TaskRecord, *, plan: Plan) -> None:
+        record.plan = plan
+        record.current_step = 0
+        record.status = TaskStatus.RUNNING
+        record.pending_action = None
+        record.confirmation_reason = None
 
     @staticmethod
     def _mark_succeeded(record: TaskRecord) -> None:
