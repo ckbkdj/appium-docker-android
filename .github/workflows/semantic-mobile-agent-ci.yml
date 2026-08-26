@@ -7,7 +7,9 @@ on:
       - ".github/workflows/semantic-mobile-agent-ci.yml"
   push:
     branches:
-      - "feat/semantic-mobile-agent-release"
+      - master
+      - "feat/semantic-mobile-agent-*"
+      - "fix/semantic-mobile-agent-*"
     paths:
       - "semantic-mobile-agent/**"
       - ".github/workflows/semantic-mobile-agent-ci.yml"
@@ -19,6 +21,10 @@ concurrency:
 jobs:
   python:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
     defaults:
       run:
         working-directory: semantic-mobile-agent
@@ -26,17 +32,50 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
           cache: pip
           cache-dependency-path: semantic-mobile-agent/pyproject.toml
-      - name: Install
-        run: python -m pip install -e '.[dev]'
+      - name: Install package, optional runtimes and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev,all]'
       - name: Ruff
-        run: ruff check src tests
+        run: python -m ruff check src tests
       - name: Compile
         run: python -m compileall -q src tests
       - name: Tests
-        run: pytest -q
+        run: python -m pytest -q
+      - name: Dependency consistency
+        run: python -m pip check
+      - name: Build wheel
+        run: python -m build --wheel --outdir dist
+      - name: Isolated wheel and packaged-data smoke test
+        run: |
+          python -m venv --system-site-packages /tmp/mobile-agent-wheel-test
+          /tmp/mobile-agent-wheel-test/bin/python -m pip install --no-deps --force-reinstall dist/*.whl
+          /tmp/mobile-agent-wheel-test/bin/python - <<'PY'
+          from pathlib import Path
+
+          import mobile_agent
+          from mobile_agent.apps import AppRegistry
+          from mobile_agent.config import Settings
+
+          module_path = Path(mobile_agent.__file__).resolve()
+          assert "/tmp/mobile-agent-wheel-test/" in str(module_path), module_path
+          registry = AppRegistry(Settings().profiles_file)
+          profile = registry.resolve("12306")
+          assert profile is not None
+          assert profile.name == "铁路12306"
+          assert len(registry.list_profiles()) >= 30
+          print(f"wheel={module_path} profiles={len(registry.list_profiles())}")
+          PY
+
+  agent-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build semantic mobile agent image
+        run: docker build --tag semantic-mobile-agent:ci semantic-mobile-agent
 
   android-bridge:
     runs-on: ubuntu-latest
