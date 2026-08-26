@@ -1,0 +1,20 @@
+services:
+  semantic-mobile-agent:
+    build: .
+    container_name: semantic-mobile-agent
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      MOBILE_AGENT_HOST: 0.0.0.0
+      MOBILE_AGENT_PORT: 8080
+      MOBILE_AGENT_DATABASE_PATH: /app/data/mobile-agent.db
+      MOBILE_AGENT_LLM_BASE_URL: ${MOBILE_AGENT_LLM_BASE_URL:-}
+      MOBILE_AGENT_LLM_API_KEY: ${MOBILE_AGENT_LLM_API_KEY:-}
+      MOBILE_AGENT_LLM_MODEL: ${MOBILE_AGENT_LLM_MODEL:-}
+      MOBILE_AGENT_APPIUM_URL: ${MOBILE_AGENT_APPIUM_URL:-http://127.0.0.1:4723}
+      MOBILE_AGENT_API_TOKEN: ${MOBILE_AGENT_API_TOKEN:-}
+    volumes:
+      - ./data:/app/data
+      - ${HOME}/.android:/home/agent/.android
+    devices:
+      - /dev/bus/usb:/dev/bus/usb
