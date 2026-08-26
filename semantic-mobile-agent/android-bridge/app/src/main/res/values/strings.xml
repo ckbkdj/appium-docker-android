@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Semantic Mobile Bridge</string>
+    <string name="service_description">Local-only semantic Android control bridge for an authorized host.</string>
+    <string name="status_running">Accessibility Bridge is running</string>
+    <string name="status_stopped">Accessibility Bridge is not enabled</string>
+    <string name="token_label">Device-local bridge token</string>
+    <string name="save_token">Save token</string>
+    <string name="open_accessibility_settings">Open accessibility settings</string>
+</resources>
